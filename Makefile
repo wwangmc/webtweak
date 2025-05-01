@@ -15,15 +15,13 @@ INSTALL_TARGET_PROCESSES = SpringBoard
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = webtweak
-
-webtweak_FILES = Tweak.x \
-					  $(wildcard GCDWebServer/Core/*.m) \
-                      $(wildcard GCDWebServer/Requests/*.m) \
-                      $(wildcard GCDWebServer/Responses/*.m)
+# 寻找当前目录下所有.x或.xm的文件以及 GCDWebServer下所有的.m文件
+webtweak_FILES = $(wildcard *.x*) $(wildcard GCDWebServer/**/*.m)
 
 
 webtweak_CFLAGS = -fobjc-arc
 # 添加头文件搜索
-webtweak_CFLAGS += -I./GCDWebServer/Core -I./GCDWebServer/Requests -I./GCDWebServer/Responses
+INCLUDE_PATHS := $(shell find GCDWebServer -type d)
+webtweak_CFLAGS += $(INCLUDE_PATHS:%=-I%)
 webtweak_PRIVATE_FRAMEWORKS = CFNetwork
 include $(THEOS_MAKE_PATH)/tweak.mk

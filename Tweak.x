@@ -1,24 +1,37 @@
-#import "GCDWebServer.h"
-#import "GCDWebServerDataResponse.h"
+#import <GCDWebServers/GCDWebServer.h>
+#import <GCDWebServers/GCDWebServerDataResponse.h>
+#import <UIKit/UIKit.h>
+
 
 %hook SpringBoard
 
 - (void)applicationDidFinishLaunching:(id)application {
     %orig;
-    // 创建服务器实例
-    GCDWebServer* webServer = [[GCDWebServer alloc] init];
+    GCDWebServer *webServer = [[GCDWebServer alloc] init];
 
-    // 添加处理程序
-    [webServer addDefaultHandlerForMethod:@"GET"
-                            requestClass:[GCDWebServerRequest class]
-                            processBlock:^GCDWebServerResponse *(GCDWebServerRequest* request) {
-        return [GCDWebServerDataResponse responseWithHTML:@"<html><body><h1>Hello from Tweak!</h1></body></html>"];
+    [webServer addHandlerForMethod:@"GET" path:@"/test" requestClass:[GCDWebServerRequest class] processBlock:^GCDWebServerResponse *(GCDWebServerRequest *request) {
+        NSDictionary *jsonData = @{
+            @"version": @"1035",
+            @"value": @{
+                @"timeZone": @"GMT-0700",
+                @"currentLocale": @"zh-Hans_US",
+                @"model": @"iPhone",
+                @"uuid": @"E133F343-E2BE-436B-AD70-1299E095D32C",
+                @"thermalState": @(0),
+                @"userInterfaceIdiom": @(0),
+                @"userInterfaceStyle": @"light",
+                @"name": @"iPhone XR",
+                @"isSimulator": @(false)
+            }
+            };
+
+        return [GCDWebServerDataResponse responseWithJSONObject:jsonData];
     }];
-
-    // 启动服务器
+    
+    // 启动服务器（默认端口8080）
+    // 启动服务器（默认端口8080）
     [webServer startWithPort:8080 bonjourName:nil];
-    NSLog(@"Server running on %@", webServer.serverURL);
-
+    NSLog(@"GCDWebServer running on %@", webServer.serverURL);
 }
 
 %end
